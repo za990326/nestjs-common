@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id          Int          @id @default(autoincrement())
+  name        String
+  description String?
+  departments Department[]
+}
+
+model Department {
+  id             Int          @id @default(autoincrement())
+  name           String
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  // 可以添加更多部门相关的字段，如部门负责人等  
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  username   String   @unique
+  password   String
+  email      String   @unique
+  name       String
+  phone      String?
+  weChatId   String? // 可选，用于微信绑定  
+  roles      Role[]   @relation()
+  visits     Visit[]
+  // 可以添加更多用户相关的字段，如用户状态、创建时间等  
+  Audit      Audit[]
+  Log        Log[]
+  createTime DateTime @default(now())
+  updateTime DateTime @updatedAt()
+}
+
+model Role {
+  id          Int          @id @default(autoincrement())
+  name        String
+  desc        String
+  userId      Int?         @unique
+  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  // 如果角色是独立于用户的（即系统角色），则不需要userId字段  
+  // 否则，如果角色是绑定到用户的（如用户自定义角色），则保留userId字段  
+  permissions Permission[]
+}
+
+model Permission {
+  id     Int    @id @default(autoincrement())
+  name   String
+  roleId Int
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  // 权限通常与角色相关联，但也可以设计为与其他实体相关联  
+}
+
+model Visit {
+  id          Int          @id @default(autoincrement())
+  userId      Int
+  user        User         @relation(fields: [userId], references: [id])
+  visitDate   DateTime
+  visitStatus String       @default("pending") // 预约状态  
+  visitorInfo VisitorInfo?
+  audit       Audit?
+  // 可以添加更多访问相关的字段，如访问目的、被访问部门等  
+}
+
+model VisitorInfo {
+  id           Int     @id @default(autoincrement())
+  visitId      Int     @unique
+  visit        Visit   @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  fullName     String
+  idCard       String?
+  phoneNumber  String
+  organization String?
+  // 可以添加更多访客相关的字段  
+}
+
+model Audit {
+  id           Int      @id @default(autoincrement())
+  visitId      Int      @unique
+  auditorId    Int
+  visit        Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  auditor      User     @relation(fields: [auditorId], references: [id])
+  auditStatus  String   @default("pending") // 审核状态  
+  auditComment String?
+  auditDate    DateTime @default(now())
+  // 可以添加更多审核相关的字段，如审核历史等  
+}
+
+// 如果需要存储系统日志或用户操作记录，可以添加如下模型  
+model Log {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  details   Json?
+  createdAt DateTime @default(now())
+}

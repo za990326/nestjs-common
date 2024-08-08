@@ -21,3 +21,15 @@ model User {
   createTime DateTime @default(now())
   updateTime DateTime @updatedAt()
 }
+
+model Article {
+  id             Int      @id @default(autoincrement())
+  title          String   @unique
+  author         String
+  classification String   @unique
+  tag            String   @unique @default("-")
+  order          Int      @unique
+  display        Boolean
+  createTime     DateTime @default(now())
+  updateTime     DateTime @updatedAt
+}

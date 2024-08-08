@@ -12,7 +12,7 @@ export class ArticleController {
     return this.articleService.create(createArticleDto);
   }
 
-  @Get()
+  @Get() 
   findAll() {
     return this.articleService.findAll();
   }

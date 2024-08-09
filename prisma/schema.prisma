@@ -23,13 +23,16 @@ model User {
 }
 
 model Article {
-  id             Int      @id @default(autoincrement())
-  title          String   @unique
-  author         String
-  classification String   @unique
-  tag            String   @unique @default("-")
-  order          Int      @unique
-  display        Boolean
-  createTime     DateTime @default(now())
-  updateTime     DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  title      String   @unique // 标题
+  user       String // 作者
+  avatar     String // 文章图标
+  comments   Int      @default(0) // 文章评论数
+  labels     String   @default("-") // 文章标题
+  state      String // 文章分类      
+  locked     Boolean  @default(false) // 是否隐藏(加密)
+  number     Int      @default(0) // 置顶越大权重越高
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
+  close_at   DateTime @default(now()) // 隐藏时间
 }

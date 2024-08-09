@@ -7,8 +7,17 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ArticleService {
   constructor(private readonly prisma: PrismaService) {}
   async create(createArticleDto: CreateArticleDto) {
-    const { title, author, classification, tag, createTime, order, display } =
-      createArticleDto;
+    const {
+      title,
+      user,
+      state,
+      labels,
+      created_at,
+      number,
+      locked,
+      avatar,
+      close_at,
+    } = createArticleDto;
     const article = await this.prisma.article.findFirst({
       where: {
         title,
@@ -16,22 +25,31 @@ export class ArticleService {
     });
     if (article) {
       return {
-        code: 200,
-        msg: '文章已存在',
+        data: '文章已存在',
       };
     }
+    console.log(Array.from(labels));
     await this.prisma.article.create({
       data: {
         title,
-        author,
-        classification,
-        tag,
-        createTime: createTime ? createTime : new Date().toLocaleString(),
-        order: order ? order : 0,
-        display: display ? display : false,
+        user,
+        state,
+        labels: labels ? (labels.join(',') as string) : '',
+        created_at: created_at ? created_at : new Date().toISOString(),
+        number: number ? number : 0,
+        locked: locked ? locked : false,
+        avatar: avatar
+          ? avatar
+          : 'https://cdn.jsdelivr.net/gh/h-1000/image@master/2021/09/16',
+        close_at: close_at ? close_at : '2021-09-30T16:00:00.000Z',
       },
     });
-    return 'This action adds a new article';
+    return {
+      data: {
+        message: '创建成功',
+        data: null,
+      },
+    };
   }
 
   findAll() {
@@ -46,7 +64,15 @@ export class ArticleService {
     return `This action updates a #${id} article`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} article`;
+  async remove(id: number) {
+    await this.prisma.article.delete({
+      where: {
+        id,
+      },
+    });
+    return {
+      message: '删除成功',
+      data: null,
+    };
   }
 }

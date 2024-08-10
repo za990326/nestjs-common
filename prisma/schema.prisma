@@ -32,7 +32,7 @@ model Article {
   state      String // 文章分类      
   locked     Boolean  @default(false) // 是否隐藏(加密)
   number     Int      @default(0) // 置顶越大权重越高
-  created_at DateTime @default(now())
+  created_at DateTime @default(now()) //ISO格式
   update_at  DateTime @updatedAt
   close_at   DateTime @default(now()) // 隐藏时间
 }

@@ -14,7 +14,7 @@ async function bootstrap() {
   // 异常过滤器
   app.useGlobalFilters(new AnyExceptionFilter());
   // 拦截器
-  app.useGlobalInterceptors(new ResultInterceptor(), new LoggingInterceptor());
+  app.useGlobalInterceptors(new ResultInterceptor(), new LoggingInterceptor());  
   // 管道类型检测
   // app.useGlobalPipes(new ValidationPipe());
   // 静态文件

@@ -1,47 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { CreateArticleDto } from './dto/create-article.dto';
-import { UpdateArticleDto } from './dto/update-article.dto';
-import { FindArticleDto } from './dto/find-article.dto';
+import { CreateDraftDto } from './dto/create-draft.dto';
+import { UpdateDraftDto } from './dto/update-draft.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { FindDraftDto } from './dto/find-draft.dto';
 
 @Injectable()
-export class ArticleService {
+export class DraftService {
   constructor(private readonly prisma: PrismaService) {}
-  async create(createArticleDto: CreateArticleDto) {
-    const {
-      title,
-      user,
-      state,
-      labels,
-      created_at,
-      number,
-      locked,
-      avatar,
-      close_at,
-    } = createArticleDto;
-    const article = await this.prisma.article.findFirst({
+  async create(createDraftDto: CreateDraftDto) {
+    const { title, user, state, labels, created_at } = createDraftDto;
+    const draft = await this.prisma.draft.findFirst({
       where: {
         title,
       },
     });
-    if (article) {
+    if (draft) {
       return {
-        mas: '此标题文章已存在',
+        msg: '该文章已存在',
+        data: draft,
       };
     }
-    await this.prisma.article.create({
+    await this.prisma.draft.create({
       data: {
         title,
         user,
         state,
         labels: labels ? (labels.join(',') as string) : '',
         created_at: created_at ? created_at : new Date().toISOString(),
-        number: number ? number : 0,
-        locked: locked ? locked : false,
-        avatar: avatar
-          ? avatar
-          : 'https://cdn.jsdelivr.net/gh/h-1000/image@master/2021/09/16',
-        close_at: close_at ? close_at : '2021-09-30T16:00:00.000Z',
       },
     });
     return {
@@ -49,8 +34,9 @@ export class ArticleService {
       data: null,
     };
   }
+
   // 查询（标题，分类，标签，创建时间）
-  async findAll(findArticleDto: FindArticleDto): Promise<any> {
+  async findAll(findDraftDto: FindDraftDto): Promise<any> {
     const {
       page = 1,
       pageSize = 10,
@@ -59,7 +45,7 @@ export class ArticleService {
       labels,
       startTime,
       endTime,
-    } = findArticleDto;
+    } = findDraftDto;
     const skip = (page - 1) * pageSize;
     // 整合全部查询和条件查询
     const whereClause: any = {};
@@ -80,22 +66,28 @@ export class ArticleService {
         lte: endTime,
       };
     }
-    const total = await this.prisma.article.count({
+    // 查询总数
+    const total = await this.prisma.draft.count({
       where: whereClause,
     });
-    const articles = await this.prisma.article.findMany({
-      where: whereClause,
+    // 查询数据
+    const drafts = await this.prisma.draft.findMany({
       skip,
       take: +pageSize,
+      where: whereClause,
     });
     return {
-      data: articles,
+      data: drafts,
       total,
     };
   }
-  // 删除文章
+  // 编辑草稿信息
+  update(id: number, updateDraftDto: UpdateDraftDto) {
+    return `This action updates a #${id} draft`;
+  }
+  // 删除草稿
   async remove(id: number) {
-    await this.prisma.article.delete({
+    await this.prisma.draft.delete({
       where: {
         id,
       },
@@ -103,15 +95,5 @@ export class ArticleService {
     return {
       msg: '删除成功',
     };
-  }
-  // 更新文章
-  async update(id: number) {
-    const article = await this.prisma.article.findFirst({
-      where: {
-        id,
-      },
-    });
-    console.log(article);
-    return '11';
   }
 }

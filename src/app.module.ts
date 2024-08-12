@@ -7,6 +7,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ArticleModule } from './article/article.module';
+import { DraftModule } from './draft/draft.module';
 
 // 引入UserController
 @Module({
@@ -26,6 +27,7 @@ import { ArticleModule } from './article/article.module';
     AuthModule,
     PrismaModule,
     ArticleModule,
+    DraftModule,
   ],
   providers: [PrismaService],
 })

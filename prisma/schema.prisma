@@ -28,11 +28,34 @@ model Article {
   user       String // 作者
   avatar     String // 文章图标
   comments   Int      @default(0) // 文章评论数
-  labels     String   @default("-") // 文章标题
+  labels     String   @default("-") // 文章标签
   state      String // 文章分类      
   locked     Boolean  @default(false) // 是否隐藏(加密)
   number     Int      @default(0) // 置顶越大权重越高
   created_at DateTime @default(now()) //ISO格式
   update_at  DateTime @updatedAt
   close_at   DateTime @default(now()) // 隐藏时间
+}
+
+// 草稿
+model Draft {
+  id         Int      @id @default(autoincrement())
+  title      String   @unique // 标题
+  user       String // 作者
+  labels     String   @default("-") // 草稿标签
+  state      String // 草稿分类      
+  created_at DateTime @default(now()) //ISO格式
+  update_at  DateTime @updatedAt
+}
+
+// 文章分类
+model article_class {
+  id    Int    @id @default(autoincrement())
+  title String @unique //分类名称
+}
+
+// 文章标签
+model article_label {
+  id    Int    @id @default(autoincrement())
+  title String @unique
 }

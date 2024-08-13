@@ -8,6 +8,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ArticleModule } from './article/article.module';
 import { DraftModule } from './draft/draft.module';
+import { CategoryModule } from './category/category.module';
+import { TagModule } from './tag/tag.module';
 
 // 引入UserController
 @Module({
@@ -28,6 +30,8 @@ import { DraftModule } from './draft/draft.module';
     PrismaModule,
     ArticleModule,
     DraftModule,
+    CategoryModule,
+    TagModule,
   ],
   providers: [PrismaService],
 })
